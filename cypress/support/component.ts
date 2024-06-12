@@ -1,3 +1,6 @@
+import { TicketEffects } from './../../projects/flight/src/app/booking/logic-flight/+state/effects';
+/* eslint-disable @typescript-eslint/no-namespace */
+
 // ***********************************************************
 // This example support/component.ts is processed and
 // loaded automatically before your test files.
@@ -14,12 +17,17 @@
 // ***********************************************************
 
 // Import commands.js using ES2015 syntax:
-import './commands'
+import { provideState, provideStore } from '@ngrx/store';
+import './commands';
 
 // Alternatively you can use CommonJS syntax:
 // require('./commands')
 
-import { mount } from 'cypress/angular'
+import { mount } from 'cypress/angular';
+import { ticketFeature } from '../../projects/flight/src/app/booking/logic-flight/+state/reducer';
+import { provideEffects } from '@ngrx/effects';
+import { provideHttpClient } from '@angular/common/http';
+import { provideRouter } from '@angular/router';
 
 // Augment the Cypress namespace to include type definitions for
 // your custom command.
@@ -33,7 +41,24 @@ declare global {
   }
 }
 
-Cypress.Commands.add('mount', mount)
+// This is necessary as mount takes a generic for it's first two arguments
+type MountParams = Parameters<typeof mount>
+
+Cypress.Commands.add(
+  'mount',
+  (component: MountParams[0], config: MountParams[1] = {}) => {
+    return mount(component, {
+      ...config,
+      providers: [
+        provideRouter([]),
+        provideHttpClient(),
+        provideStore(),
+        provideState(ticketFeature),
+        provideEffects([TicketEffects])
+      ]
+    });
+  }
+)
 
 // Example use:
 // cy.mount(MyComponent)
