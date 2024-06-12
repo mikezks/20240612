@@ -1,3 +1,4 @@
+import { provideMockStore } from '@ngrx/store/testing';
 import { TicketEffects } from './../../projects/flight/src/app/booking/logic-flight/+state/effects';
 /* eslint-disable @typescript-eslint/no-namespace */
 
@@ -51,10 +52,35 @@ Cypress.Commands.add(
       ...config,
       providers: [
         provideRouter([]),
-        provideHttpClient(),
-        provideStore(),
-        provideState(ticketFeature),
-        provideEffects([TicketEffects])
+        provideMockStore({
+          initialState: {
+            tickets: {
+              flights: [
+                {
+                  id: 111,
+                  from: 'Innsbruck',
+                  to: 'LA',
+                  date: new Date().toISOString(),
+                  delayed: true
+                }
+              ]
+            }
+          },
+          selectors: [
+            {
+              selector: ticketFeature.selectFlights,
+              value: [
+                {
+                  id: 999,
+                  from: 'Wien',
+                  to: 'NYC',
+                  date: new Date().toISOString(),
+                  delayed: true
+                }
+              ]
+            }
+          ]
+        })
       ]
     });
   }
